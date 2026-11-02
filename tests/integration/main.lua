@@ -125,11 +125,6 @@ function love.draw()
 		end
 		gameDraw()
 		love.graphics.draw = draw
-		if stage == 2 and movementFrames == 25 and os.getenv("MARI0_CAPTURE") == "1" then
-			local player = objects.player[1]
-			display.canvas:newImageData():encode("png", "facing.png")
-			love.filesystem.write("facing-position.txt", string.format("%f %f", ((player.x - xscroll) * 16 + player.offsetX) * scale, (player.y * 16 - player.offsetY) * scale))
-		end
 		if stage == 0 and not canvasChecked then
 			assertVisibleCanvas()
 			shaders:set(2, nil)

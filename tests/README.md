@@ -1,6 +1,6 @@
 # Local tests
 
-Run the movement and viewport tests from the repository root:
+Run the movement, facing and viewport tests from the repository root:
 
 ```sh
 xvfb-run -a love tests
