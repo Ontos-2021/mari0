@@ -114,13 +114,13 @@ function guielement:update(dt)
 		if self.type == "scrollbar" then
 			if self.dragging then
 				if self.dir == "ver" then
-					local y = (love.mouse.getY()-self.draggingy) - self.y*scale
+					local y = (display.getMouseY()-self.draggingy) - self.y*scale
 					local actualyrange = self.yrange*scale
 
 					self.value = y / actualyrange
 					self.value = math.min(math.max(self.value, 0), 1) --clamp
 				else
-					local x = (love.mouse.getX()-self.draggingx) - self.x*scale
+					local x = (display.getMouseX()-self.draggingx) - self.x*scale
 					local actualxrange = self.xrange*scale
 
 					self.value = x / actualxrange
@@ -145,13 +145,13 @@ function guielement:draw()
 			quad = 2
 		end
 		local high = 1
-		if self:inhighlight(love.mouse.getPosition()) then
+		if self:inhighlight(display.getMousePosition()) then
 			high = 2
 		end
 
 		love.graphics.draw(checkboximg, checkboxquad[high][quad], self.x*scale, self.y*scale, 0, scale, scale)
 	elseif self.type == "dropdown" then
-		local high = self:inhighlight(love.mouse.getPosition())
+		local high = self:inhighlight(display.getMousePosition())
 
 		love.graphics.setColor(0.5, 0.5, 0.5)
 		if high then
@@ -193,7 +193,7 @@ function guielement:draw()
 
 		end
 	elseif self.type == "rightclick" then
-		local high = self:inhighlight(love.mouse.getPosition())
+		local high = self:inhighlight(display.getMousePosition())
 
 		love.graphics.setColor(1, 1, 1)
 
@@ -249,7 +249,7 @@ function guielement:draw()
 		end
 
 	elseif self.type == "button" then
-		local high = self:inhighlight(love.mouse.getPosition())
+		local high = self:inhighlight(display.getMousePosition())
 
 		love.graphics.setColor(self.bordercolor)
 		if high then
@@ -266,7 +266,7 @@ function guielement:draw()
 
 	elseif self.type == "scrollbar" then
 		if self.dir == "ver" then
-			local high = self:inhighlight(love.mouse.getPosition())
+			local high = self:inhighlight(display.getMousePosition())
 
 			love.graphics.setColor(self.backgroundcolor)
 			love.graphics.rectangle("fill", self.x*scale, self.y*scale, self.width*scale, (self.yrange+self.height)*scale)
@@ -281,7 +281,7 @@ function guielement:draw()
 			love.graphics.setColor(self.fillcolor)
 			love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1+self.yrange*self.value)*scale, (self.width-2)*scale, (self.height-2)*scale)
 		else
-			local high = self:inhighlight(love.mouse.getPosition())
+			local high = self:inhighlight(display.getMousePosition())
 
 			love.graphics.setColor(self.backgroundcolor)
 			love.graphics.rectangle("fill", self.x*scale, self.y*scale, (self.xrange+self.width)*scale, self.height*scale)
@@ -297,7 +297,7 @@ function guielement:draw()
 			love.graphics.rectangle("fill", (self.x+1+self.xrange*self.value)*scale, (self.y+1)*scale, (self.width-2)*scale, (self.height-2)*scale)
 		end
 	elseif self.type == "input" then
-		local high = self:inhighlight(love.mouse.getPosition())
+		local high = self:inhighlight(display.getMousePosition())
 
 		love.graphics.setColor(self.bordercolor)
 		if self.inputting or high then

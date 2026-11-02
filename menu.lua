@@ -979,7 +979,7 @@ function menu_draw()
 			end
 
 			love.graphics.setColor(0.4, 0.4, 0.4)
-			properprint("you can lock the|mouse with f12", 30*scale, 165*scale)
+			properprint("f11 fullscreen|f12 lock mouse", 30*scale, 165*scale)
 
 			love.graphics.setColor(1, 1, 1, 1)
 			properprint(versionstring, 150*scale, 207*scale)

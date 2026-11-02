@@ -4,6 +4,9 @@
 	Licensed under MIT. You should not have received a copy of the MIT license with this program because just google for it, cmon.
 ]]
 
+display = require "display"
+movement = require "movement"
+
 function love.load()
 	love.filesystem.setIdentity("mari0")
 	if not love.filesystem.getSaveDirectory():match("LOVE") then
@@ -38,8 +41,7 @@ function love.load()
 
 	saveconfig()
 	width = 25
-	fullscreen = false
-	changescale(scale, fullscreen)
+	changescale(scale)
 	love.window.setTitle( "Mari0" )
 
 	--version check
@@ -824,6 +826,7 @@ function love.update(dt)
 end
 
 function love.draw()
+	display.beginDraw()
 	shaders:predraw()
 
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "options" then
@@ -837,6 +840,7 @@ function love.draw()
 	end
 
 	shaders:postdraw()
+	display.endDraw()
 
 	love.graphics.setColor(1, 1,1)
 end
@@ -903,6 +907,7 @@ function saveconfig()
 	end
 
 	s = s .. "scale:" .. scale .. ";"
+	s = s .. "fullscreen:" .. tostring(fullscreen) .. ";"
 
 	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
 	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
@@ -1022,6 +1027,8 @@ function loadconfig()
 
 		elseif s2[1] == "scale" then
 			scale = tonumber(s2[2])
+		elseif s2[1] == "fullscreen" then
+			fullscreen = s2[2] == "true"
 
 		elseif s2[1] == "shader1" then
 			for i = 1, #shaderlist do
@@ -1159,6 +1166,7 @@ function defaultconfig()
 
 	--options
 	scale = 2
+	fullscreen = false
 	volume = 1
 	mappack = "smb"
 	vsync = -1
@@ -1230,20 +1238,15 @@ function continuegame()
 	love.filesystem.remove("suspend.txt")
 end
 
-function changescale(s, fullscreen)
+function changescale(s)
 	scale = s
-
-	if fullscreen then
-		fullscreen = true
-		scale = 2
-		love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync})
-	end
-
 	uispace = math.floor(width*16*scale/4)
-	love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync}) --27x14 blocks (15 blocks actual height)
-
-	gamewidth = love.graphics.getWidth()
-	gameheight = love.graphics.getHeight()
+	gamewidth = width*16*scale
+	gameheight = 224*scale
+	if not display.setMode(gamewidth, gameheight, fullscreen, vsync) and fullscreen then
+		fullscreen = false
+		display.setMode(gamewidth, gameheight, false, vsync)
+	end
 
 	if shaders then
 		shaders:refresh()
@@ -1253,6 +1256,12 @@ end
 function love.keypressed(key, unicode)
 	if keyprompt then
 		keypromptenter("key", key)
+		return
+	end
+	if key == "f11" then
+		fullscreen = not fullscreen
+		changescale(scale)
+		saveconfig()
 		return
 	end
 
@@ -1296,6 +1305,10 @@ function love.keyreleased(key, unicode)
 end
 
 function love.mousepressed(x, y, button)
+	x, y = display.toGame(x, y)
+	if display.canvas and not display.contains(x, y) then
+		return
+	end
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "options" then
 		menu_mousepressed(x, y, button)
 	elseif gamestate == "game" then
@@ -1322,6 +1335,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button)
+	x, y = display.toGame(x, y)
 	if gamestate == "menu" or gamestate == "options" then
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then

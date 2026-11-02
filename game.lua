@@ -1231,16 +1231,15 @@ function game_draw()
 				for i, v in pairs(w) do
 					if v.drawable then
 						love.graphics.setColor(1, 1, 1)
-						local dirscale
+						local dirscale, aimscale
 
 						if j == "player" then
-							if v.pointingangle > 0 then
-								dirscale = -scale
-							else
-								dirscale = scale
-							end
+							local bodydirection, aimdirection = movement.facing(v)
+							dirscale = bodydirection * scale
+							aimscale = aimdirection * scale
 							if bigmario then
 								dirscale = dirscale * scalefactor
+								aimscale = aimscale * scalefactor
 							end
 						else
 							if v.animationdirection == "left" then
@@ -1354,7 +1353,7 @@ function game_draw()
 
 							if v.graphic[0] then
 								love.graphics.setColor(1, 1, 1)
-								love.graphics.draw(v.graphic[0], v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor((v.y*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
+								love.graphics.draw(v.graphic[0], v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor((v.y*16-v.offsetY)*scale), v.rotation, aimscale or dirscale, horscale, v.quadcenterX, v.quadcenterY)
 							end
 						else
 							if v.graphic and v.quad then
@@ -1373,6 +1372,7 @@ function game_draw()
 
 								if pad ~= v.animationdirection then
 									dirscale = -dirscale
+									if aimscale then aimscale = -aimscale end
 								end
 
 								horscale = scale
@@ -1451,7 +1451,7 @@ function game_draw()
 
 									if v.graphic[0] then
 										love.graphics.setColor(1, 1, 1)
-										love.graphics.draw(v.graphic[0], v.quad, math.floor(((px-xscroll)*16+v.offsetX)*scale), math.floor((py*16-v.offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
+										love.graphics.draw(v.graphic[0], v.quad, math.floor(((px-xscroll)*16+v.offsetX)*scale), math.floor((py*16-v.offsetY)*scale), pr, aimscale or dirscale, horscale, v.quadcenterX, v.quadcenterY)
 									end
 								else
 									love.graphics.draw(v.graphic, v.quad, math.ceil(((px-xscroll)*16+v.offsetX)*scale), math.ceil((py*16-v.offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
@@ -2716,9 +2716,9 @@ function game_keypressed(key, unicode)
 			objects["player"][i]:removeportals()
 		elseif controls[i]["use"][1] == key then
 			objects["player"][i]:use()
-		elseif controls[i]["left"][1] == key then
+		elseif controls[i]["left"][1] == key or (key == "left" and movement.arrowAvailable(i, "left", controls, players)) then
 			objects["player"][i]:leftkey()
-		elseif controls[i]["right"][1] == key then
+		elseif controls[i]["right"][1] == key or (key == "right" and movement.arrowAvailable(i, "right", controls, players)) then
 			objects["player"][i]:rightkey()
 		end
 
@@ -3857,22 +3857,22 @@ end
 
 function rightkey(i)
 	local s = controls[i]["right"]
-	return checkkey(s)
+	return checkkey(s) or (i == 1 and love.keyboard.isDown("right") and movement.arrowAvailable(i, "right", controls, players))
 end
 
 function leftkey(i)
 	local s = controls[i]["left"]
-	return checkkey(s)
+	return checkkey(s) or (i == 1 and love.keyboard.isDown("left") and movement.arrowAvailable(i, "left", controls, players))
 end
 
 function downkey(i)
 	local s = controls[i]["down"]
-	return checkkey(s)
+	return checkkey(s) or (i == 1 and love.keyboard.isDown("down") and movement.arrowAvailable(i, "down", controls, players))
 end
 
 function upkey(i)
 	local s = controls[i]["up"]
-	return checkkey(s)
+	return checkkey(s) or (i == 1 and love.keyboard.isDown("up") and movement.arrowAvailable(i, "up", controls, players))
 end
 
 function checkkey(s)

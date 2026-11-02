@@ -138,12 +138,12 @@ function editor_update(dt)
 		end
 
 		if love.mouse.isDown(1) and allowdrag then
-			local x, y = love.mouse.getPosition()
+			local x, y = display.getMousePosition()
 			placetile(x, y)
 		end
 	elseif editorstate == "main" then
 		if love.mouse.isDown(1) then
-			local mousex, mousey = love.mouse.getPosition()
+			local mousex, mousey = display.getMousePosition()
 			if mousey >= minimapy*scale and mousey < (minimapy+34)*scale then
 				if mousex >= minimapx*scale and mousex < (minimapx+394)*scale then
 					if mousex < (minimapx+width)*scale then
@@ -206,14 +206,14 @@ end
 function editor_draw()
 	love.graphics.setColor(1, 1, 1)
 
-	local mousex, mousey = love.mouse.getPosition()
+	local mousex, mousey = display.getMousePosition()
 
 	--EDITOR
 	if editormenuopen == false then
 		if rightclickmenuopen then
 			rightclickmenu:draw()
 		elseif editorstate ~= "linktool" and editorstate ~= "portalgun" then
-			local x, y = getMouseTile(love.mouse.getX(), love.mouse.getY()-8*scale)
+			local x, y = getMouseTile(mousex, mousey-8*scale)
 
 			if inmap(x, y+1) then
 				love.graphics.setColor(1, 1, 1, 0.8)
@@ -322,7 +322,7 @@ function editor_draw()
 				end
 			end
 
-			local tile = gettilelistpos(love.mouse.getX(), love.mouse.getY())
+			local tile = gettilelistpos(mousex, mousey)
 			if editentities == false then
 				if tile and tile <= tilelistcount+1 then
 					love.graphics.setColor(1, 1, 1, 0.5)

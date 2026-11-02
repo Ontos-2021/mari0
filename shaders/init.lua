@@ -10,8 +10,8 @@ local function CreateShaderPass()
 	local pass = {
 		cureffect = "",
 		on = false,
-		xres = love.graphics.getWidth(),
-		yres = love.graphics.getHeight(),
+		xres = gamewidth,
+		yres = gameheight,
 	}
 
 	function pass:useCanvas()
@@ -162,10 +162,10 @@ end
 function shaders:refresh()
 	if not self.scale or self.scale ~= scale
 	or not self.xres or not self.yres
-	or self.xres ~= love.graphics.getWidth() or self.yres ~= love.graphics.getHeight() then
+	or self.xres ~= gamewidth or self.yres ~= gameheight then
 		self.scale = scale
 
-		self.xres, self.yres = love.graphics.getWidth(), love.graphics.getHeight()
+		self.xres, self.yres = gamewidth, gameheight
 		self.po2xres, self.po2yres = FindNextPO2(self.xres), FindNextPO2(self.yres)
 
 		for i,v in ipairs(self.passes) do
@@ -182,6 +182,7 @@ end
 function shaders:predraw()
 	-- only predraw the first available pass here (we'll do the rest in postdraw)
 	self.curcanvas = nil
+	self.outputcanvas = love.graphics.getCanvas()
 	for i,v in ipairs(self.passes) do
 		local canvas = v:predraw()
 		if canvas then
@@ -212,6 +213,8 @@ function shaders:postdraw()
 	for i,v in ipairs(activepasses) do
 		if i < #activepasses then
 			activepasses[i+1]:predraw()
+		elseif self.outputcanvas then
+			love.graphics.setCanvas(self.outputcanvas)
 		else
 			love.graphics.setCanvas()
 		end
